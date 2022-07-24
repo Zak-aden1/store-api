@@ -1,6 +1,7 @@
 require('dotenv').config()
 const express = require('express');
-const connectDB = require('./db/connect')
+const connectDB = require('./db/connect');
+const productRouter = require('./routes/product');
 
 const app = express();
 
@@ -14,6 +15,8 @@ app.use(express.json())
 app.get('/', (req, res) => {
  res.send('store api')
 })
+
+app.use('/api/v1/products', productRouter)
 
 // product routes
 app.use(notFoundMiddleware)
