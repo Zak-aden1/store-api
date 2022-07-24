@@ -1,5 +1,6 @@
 const getAllProducts = (req, res) => {
-  res.send('get all products')
+  throw new Error('testing async err')
+  res.status(200).json({data: 'get all products'})
 }
 
 module.exports = {
