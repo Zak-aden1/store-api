@@ -1,5 +1,6 @@
 require('dotenv').config()
 const express = require('express');
+const connectDB = require('./db/connect')
 
 const app = express();
 
@@ -14,4 +15,14 @@ app.get('/', (req, res) => {
  res.send('store api')
 })
 
-app.listen(process.env.PORT)
+// product routes
+app.use(notFoundMiddleware)
+app.use(errorMiddleware)
+
+connectDB(process.env.MONGO_URI)
+  .then(() => {
+    app.listen(process.env.PORT, () => {
+      console.log('server is running in port 3000');
+    })
+  })
+  .catch(err => console.log(err))
