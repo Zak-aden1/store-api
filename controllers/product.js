@@ -3,7 +3,7 @@ const mongoose = require('mongoose')
 
 const getAllProducts = async (req, res) => {
   // throw new Error('testing async err')
-  const {featured, company, name, sort, fields } = req.query
+  const {featured, company, name, sort, fields, numericFilters } = req.query
 
   const queryObject = {}
 
@@ -17,6 +17,31 @@ const getAllProducts = async (req, res) => {
   if(name) {
     queryObject.name = {$regex: name, $options: 'i'}
   }
+  if(numericFilters) {
+    // queryObject.name = {$regex: name, $options: 'i'}
+    console.log(numericFilters);
+    const operatorMap = {
+      '>': '$gt',
+      '>=': '$gte',
+      '=': '$eq',
+      '<': '$lt',
+      '<=': '$lte',
+    }
+    const regEx = /\b(<|>|>=|=|<=)\b/g
+    let filters = numericFilters.replace(regEx, (match) => `-${operatorMap[match]}-`)
+
+    const options = ['price', 'rating']
+    filters = filters.split(',').forEach(item => {
+      const [field, operator, value] = item.split('-')
+      console.log('item', value);
+
+      if (options.includes(field)) {
+        queryObject[field] = {[operator]: Number(value)}
+      }
+    })
+  }
+
+  console.log(queryObject);
 
   let result = Product.find(queryObject)
   // sort logic
@@ -34,10 +59,7 @@ const getAllProducts = async (req, res) => {
     result = result.select(fieldsList)
   }
 
-  // limit
-  // if(limit) {
-  //   result = result.limit(Number(limit))
-  // }
+  // add pagination logic 
   const page = Number(req.query.page) || 1
   const limit = Number(req.query.limit) || 10
   const skip = (page -1) * limit;
