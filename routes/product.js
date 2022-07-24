@@ -1,9 +1,7 @@
 const express = require('express');
-const { appendFile } = require('fs');
 const router = express.Router();
+const { getAllProducts } = require('../controllers/product')
 
-router.get('/', (req, res) => {
-  res.send('product route')
-})
+router.route('/').get(getAllProducts)
 
 module.exports = router
